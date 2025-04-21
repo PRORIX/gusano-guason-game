@@ -1,0 +1,9 @@
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/controllers/CambiarPerfilController.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/controllers/JugarController.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/controllers/LoginController.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/controllers/PerfilController.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/controllers/RecuperarContraseniaController.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/controllers/RegistroController.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/database/ConexionBD.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/main/MainApp.java
+/home/dam/gusano-guason-game/gusanoguason/src/main/java/es/prorix/gusanoguason/models/Usuario.java
