@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="es.prorix.gusanoguason.controllers.LoginController">
+    <children>
+        <VBox spacing="10" alignment="CENTER" AnchorPane.topAnchor="50" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50">
+            <Label text="Iniciar Sesión" style="-fx-font-size: 24;" />
+            <TextField fx:id="emailField" promptText="Correo electrónico" maxWidth="300" />
+            <PasswordField fx:id="contrasenaField" promptText="Contraseña" maxWidth="300" />
+            <Button text="Entrar" onAction="#iniciarSesion" maxWidth="300"/>
+            <Label fx:id="mensajeLabel" style="-fx-text-fill: red;" />
+        </VBox>
+    </children>
+</AnchorPane>
