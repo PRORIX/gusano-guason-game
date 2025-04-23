@@ -1,5 +1,11 @@
 package es.prorix.gusanoguason.controllers;
 
+import javafx.animation.AnimationTimer;
+import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 
 import java.util.*;
@@ -9,117 +15,144 @@ public class JugarController {
     @FXML
     private Canvas canvas;
 
-    private final int TAM_CASILLA = 20;
-    private final int FILAS = 25;
-    private final int COLUMNAS = 25;
+    private final int tileSize = 25;
+    private final int width = 20;
+    private final int height = 20;
 
-    private List<int[]> gusano = new ArrayList<>();
-    private String direccion = "RIGHT";
-    private boolean enJuego = true;
-    private int[] manzana;
+    private enum Direction {UP, DOWN, LEFT, RIGHT}
 
-    private long ultimaActualizacion = 0;
-    private final long INTERVALO = 200_000_000;
+    private Direction direction = Direction.RIGHT;
+    private Direction nextDirection = Direction.RIGHT;
 
+    private List<int[]> snake;
+    private int[] apple;
+    private boolean running = false;
+    private boolean revived = false;
+    private int score = 0;
+    private int bestScore = 0; // Puedes luego guardar esto en la base de datos del perfil
+
+    private final Random random = new Random();
+
+    @FXML
     public void initialize() {
-        // Inicializa gusano
-        gusano.clear();
-        gusano.add(new int[]{5, 5});
-
-        generarManzana();
-
-        // Captura teclas
         canvas.setFocusTraversable(true);
-        canvas.setOnKeyPressed(e -> {
-            KeyCode code = e.getCode();
-            switch (code) {
-                case UP: if (!direccion.equals("DOWN")) direccion = "UP"; break;
-                case DOWN: if (!direccion.equals("UP")) direccion = "DOWN"; break;
-                case LEFT: if (!direccion.equals("RIGHT")) direccion = "LEFT"; break;
-                case RIGHT: if (!direccion.equals("LEFT")) direccion = "RIGHT"; break;
-            }
-        });
+        canvas.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyPress);
+        startGame();
+    }
 
-        // Bucle de juego
+    private void startGame() {
+        snake = new LinkedList<>();
+        snake.add(new int[]{10, 10});
+        direction = Direction.RIGHT;
+        nextDirection = Direction.RIGHT;
+        score = 0;
+        spawnApple();
+        running = true;
+
         AnimationTimer timer = new AnimationTimer() {
+            long lastTick = 0;
+
             @Override
             public void handle(long now) {
-                if (now - ultimaActualizacion >= INTERVALO) {
-                    if (enJuego) {
-                        actualizar();
-                        dibujar();
-                    }
-                    ultimaActualizacion = now;
+                if (lastTick == 0) {
+                    lastTick = now;
+                    tick();
+                    return;
+                }
+                if (now - lastTick > 200_000_000) {
+                    lastTick = now;
+                    tick();
                 }
             }
         };
         timer.start();
     }
 
-    private void actualizar() {
-        int[] cabeza = gusano.get(0);
-        int nuevaX = cabeza[0];
-        int nuevaY = cabeza[1];
+    private void tick() {
+        if (!running) return;
 
-        switch (direccion) {
-            case "UP": nuevaY--; break;
-            case "DOWN": nuevaY++; break;
-            case "LEFT": nuevaX--; break;
-            case "RIGHT": nuevaX++; break;
+        direction = nextDirection;
+        int[] head = snake.get(0);
+        int newX = head[0];
+        int newY = head[1];
+
+        switch (direction) {
+            case UP -> newY--;
+            case DOWN -> newY++;
+            case LEFT -> newX--;
+            case RIGHT -> newX++;
         }
 
-        // Comprobación de límites o autocolisión
-        if (nuevaX < 0 || nuevaY < 0 || nuevaX >= COLUMNAS || nuevaY >= FILAS || colision(nuevaX, nuevaY)) {
-            enJuego = false;
-            return;
-        }
+        int[] newHead = new int[]{newX, newY};
 
-        gusano.add(0, new int[]{nuevaX, nuevaY});
-
-        if (nuevaX == manzana[0] && nuevaY == manzana[1]) {
-            generarManzana();
-        } else {
-            gusano.remove(gusano.size() - 1);
-        }
-    }
-
-    private void dibujar() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-        // Dibujar manzana
-        gc.setFill(Color.RED);
-        gc.fillOval(manzana[0] * TAM_CASILLA, manzana[1] * TAM_CASILLA, TAM_CASILLA, TAM_CASILLA);
-
-        // Dibujar gusano
-        gc.setFill(Color.LIMEGREEN);
-        for (int[] segmento : gusano) {
-            gc.fillRect(segmento[0] * TAM_CASILLA, segmento[1] * TAM_CASILLA, TAM_CASILLA, TAM_CASILLA);
-        }
-
-        if (!enJuego) {
-            gc.setFill(Color.WHITE);
-            gc.fillText("¡Has perdido!", canvas.getWidth() / 2 - 30, canvas.getHeight() / 2);
-        }
-    }
-
-    private boolean colision(int x, int y) {
-        for (int[] segmento : gusano) {
-            if (segmento[0] == x && segmento[1] == y) {
-                return true;
+        // Check collision with wall or itself
+        if (newX < 0 || newY < 0 || newX >= width || newY >= height || snake.stream().anyMatch(p -> Arrays.equals(p, newHead))) {
+            if (!revived && random.nextDouble() < 0.3) {
+                revived = true;
+                // simplemente ignora el tick donde muere y continúa en el siguiente
+                return;
+            } else {
+                running = false;
+                if (score > bestScore) bestScore = score;
+                // Aquí podrías mostrar un menú para volver a jugar o volver al perfil
+                return;
             }
         }
-        return false;
+
+        snake.add(0, newHead);
+
+        if (Arrays.equals(newHead, apple)) {
+            score++;
+            spawnApple();
+        } else {
+            snake.remove(snake.size() - 1);
+        }
+
+        draw();
     }
 
-    private void generarManzana() {
-        Random rand = new Random();
-        int x, y;
+    private void draw() {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.web("#1e1e1e"));
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // Draw apple
+        gc.setFill(Color.RED);
+        gc.fillOval(apple[0] * tileSize, apple[1] * tileSize, tileSize, tileSize);
+
+        // Draw snake
+        for (int i = 0; i < snake.size(); i++) {
+            int[] p = snake.get(i);
+            gc.setFill(i == 0 ? Color.LIME : Color.GREEN);
+            gc.fillRect(p[0] * tileSize, p[1] * tileSize, tileSize, tileSize);
+        }
+
+        // Draw score
+        gc.setFill(Color.WHITE);
+        gc.fillText("Puntos: " + score, 10, 20);
+    }
+
+    private void spawnApple() {
         do {
-            x = rand.nextInt(COLUMNAS);
-            y = rand.nextInt(FILAS);
-        } while (colision(x, y));
-        manzana = new int[]{x, y};
+            apple = new int[]{random.nextInt(width), random.nextInt(height)};
+        } while (snake.stream().anyMatch(p -> Arrays.equals(p, apple)));
+    }
+
+    private void handleKeyPress(KeyEvent e) {
+        KeyCode code = e.getCode();
+        switch (code) {
+            case UP -> {
+                if (direction != Direction.DOWN) nextDirection = Direction.UP;
+            }
+            case DOWN -> {
+                if (direction != Direction.UP) nextDirection = Direction.DOWN;
+            }
+            case LEFT -> {
+                if (direction != Direction.RIGHT) nextDirection = Direction.LEFT;
+            }
+            case RIGHT -> {
+                if (direction != Direction.LEFT) nextDirection = Direction.RIGHT;
+            }
+        }
     }
 }

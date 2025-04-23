@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Rectangle?>
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="es.prorix.gusanoguason.controllers.JugarController">
     <children>
-        <Canvas fx:id="canvas" width="500" height="500" />
+        <!-- Fondo decorativo -->
+        <Rectangle width="500" height="500" fill="#121212" />
+
+        <!-- Contenedor del canvas con sombra -->
+        <StackPane layoutX="0" layoutY="0" prefWidth="500" prefHeight="500">
+            <Canvas fx:id="canvas" width="500" height="500" style="-fx-effect: dropshadow(gaussian, #2ecc71, 10, 0.5, 0, 0);" />
+        </StackPane>
+
+        <!-- Etiqueta de puntuación -->
+
+        <!-- Etiqueta de mensaje (para revivir, perder, etc.) -->
+        <Label fx:id="messageLabel" layoutX="250" layoutY="250" text="" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
     </children>
 </AnchorPane>
