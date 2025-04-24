@@ -37,7 +37,7 @@ public class Usuario {
      * @param contrasena Contraseña del usuario
      * @param record Record del usuario
      */
-    public Usuario(String nombre, String email, String contrasena) {
+    public Usuario(String nombre, String email, String contrasena, int record) {
         this.nombre = nombre;
         this.email = email;
         this.contrasena = contrasena;

@@ -6,14 +6,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="es.prorix.gusanoguason.controllers.JugarController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/estilos.css" fx:controller="es.prorix.gusanoguason.controllers.JugarController">
     <children>
         <Canvas fx:id="canvas" width="500" height="500" />
 
         <VBox fx:id="gameOverBox" spacing="10" layoutX="100" layoutY="180" visible="false" style="-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20; -fx-background-radius: 10;">
             <Label fx:id="gameOverLabel" text="¡Has perdido!" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
-            <Button text="Volver a jugar" onAction="#onVolverAJugar"/>
-            <Button text="Ir al perfil" onAction="#onIrAlPerfil"/>
+            <Button fx:id="volverJugar" text="Volver a jugar" onAction="#onVolverAJugar"/>
+            <Button fx:id="salir" text="Ir al perfil" onAction="#onIrAlPerfil"/>
         </VBox>
     </children>
 </AnchorPane>

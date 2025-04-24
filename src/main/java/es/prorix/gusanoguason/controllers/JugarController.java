@@ -4,16 +4,44 @@ import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.Node;
+import javafx.event.ActionEvent;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.*;
+
+import es.prorix.gusanoguason.database.ConexionBD;
+import es.prorix.gusanoguason.models.Usuario;
+import es.prorix.gusanoguason.util.UsuarioService;
+
 
 public class JugarController {
 
     @FXML
     private Canvas canvas;
+
+    @FXML
+    private VBox gameOverBox;
+
+    @FXML
+    private Label gameOverLabel;
+
+    @FXML
+    private Button volverJugar;
+
+    @FXML
+    private Button salir;
 
     private final int tileSize = 25;
     private final int width = 20;
@@ -29,9 +57,10 @@ public class JugarController {
     private boolean running = false;
     private boolean revived = false;
     private int score = 0;
-    private int bestScore = 0; // Puedes luego guardar esto en la base de datos del perfil
-
+    private int bestScore = 0; // Enlaza con base de datos si quieres
     private final Random random = new Random();
+
+    private AnimationTimer timer;
 
     @FXML
     public void initialize() {
@@ -41,15 +70,17 @@ public class JugarController {
     }
 
     private void startGame() {
+        gameOverBox.setVisible(false);
         snake = new LinkedList<>();
         snake.add(new int[]{10, 10});
         direction = Direction.RIGHT;
         nextDirection = Direction.RIGHT;
         score = 0;
+        revived = false;
         spawnApple();
         running = true;
 
-        AnimationTimer timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             long lastTick = 0;
 
             @Override
@@ -85,19 +116,26 @@ public class JugarController {
 
         int[] newHead = new int[]{newX, newY};
 
-        // Check collision with wall or itself
-        if (newX < 0 || newY < 0 || newX >= width || newY >= height || snake.stream().anyMatch(p -> Arrays.equals(p, newHead))) {
+        // Colisión
+        boolean collision = newX < 0 || newY < 0 || newX >= width || newY >= height
+                || snake.stream().anyMatch(p -> Arrays.equals(p, newHead));
+
+        if (collision) {
             if (!revived && random.nextDouble() < 0.3) {
                 revived = true;
-                // simplemente ignora el tick donde muere y continúa en el siguiente
-                return;
+                return; // continúa como si nada hubiera pasado
             } else {
                 running = false;
+                timer.stop();
                 if (score > bestScore) bestScore = score;
-                // Aquí podrías mostrar un menú para volver a jugar o volver al perfil
+                gameOverBox.setVisible(true);
+                gameOverLabel.setText("¡Has perdido!\nPuntuación: " + score);
+                revisarRecord();
                 return;
             }
         }
+
+
 
         snake.add(0, newHead);
 
@@ -111,23 +149,60 @@ public class JugarController {
         draw();
     }
 
+    public boolean revisarRecord(){
+        Usuario usuarioActual = UsuarioService.getUsuarioActual();
+        String emailActual = usuarioActual.getEmail();
+        try {
+            Connection conn2 = ConexionBD.getConexion();
+            usuarioActual.setRecord(score);
+            String queryS = "SELECT record FROM usuarios WHERE email=?";
+            PreparedStatement pStatement = conn2.prepareStatement(queryS);
+            record.setInt(1, emailActual);
+            return record.executeUpdate()>0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }finally{
+            ConexionBD.cerrarConexion();
+        }
+
+        if (score > usuarioActual.getRecord()) {
+            try {
+                Connection conn = ConexionBD.getConexion();
+                usuarioActual.setRecord(score);
+                String updateRecord = "UPDATE usuarios SET record=? WHERE email=?";
+                PreparedStatement record = conn.prepareStatement(updateRecord);
+                record.setInt(1, score);
+                record.setString(2, usuarioActual.getEmail());
+                return record.executeUpdate()>0;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }finally{
+                ConexionBD.cerrarConexion();
+            }
+
+        }
+        return false;
+    }
+
     private void draw() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.web("#1e1e1e"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Draw apple
+        // Dibujar manzana
         gc.setFill(Color.RED);
         gc.fillOval(apple[0] * tileSize, apple[1] * tileSize, tileSize, tileSize);
 
-        // Draw snake
+        // Dibujar gusano
         for (int i = 0; i < snake.size(); i++) {
             int[] p = snake.get(i);
             gc.setFill(i == 0 ? Color.LIME : Color.GREEN);
             gc.fillRect(p[0] * tileSize, p[1] * tileSize, tileSize, tileSize);
         }
 
-        // Draw score
+        // Puntos
         gc.setFill(Color.WHITE);
         gc.fillText("Puntos: " + score, 10, 20);
     }
@@ -153,6 +228,24 @@ public class JugarController {
             case RIGHT -> {
                 if (direction != Direction.LEFT) nextDirection = Direction.RIGHT;
             }
+        }
+    }
+
+    @FXML
+    public void onVolverAJugar() {
+        startGame();
+    }
+
+    @FXML
+    public void onIrAlPerfil(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/perfil.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

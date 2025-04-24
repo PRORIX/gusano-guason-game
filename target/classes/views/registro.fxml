@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" 
-            fx:controller="es.prorix.gusanoguason.controllers.RegistroController"
-            prefWidth="500" prefHeight="600">
+<AnchorPane prefHeight="600" prefWidth="500" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" stylesheets="@../css/estilos.css" fx:controller="es.prorix.gusanoguason.controllers.RegistroController">
 
-    <VBox spacing="15" alignment="CENTER" layoutX="50" layoutY="100" prefWidth="400" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50">
+    <VBox alignment="CENTER" layoutX="50" layoutY="100" prefWidth="400" spacing="15" AnchorPane.leftAnchor="50" AnchorPane.rightAnchor="50">
         
-        <Label text="Registro de Usuario" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Registro de Usuario" />
 
-        <TextField fx:id="nombreField" promptText="Nombre completo" maxWidth="300" />
-        <TextField fx:id="emailField" promptText="Correo electrónico" maxWidth="300" />
-        <PasswordField fx:id="contrasenaField" promptText="Contraseña" maxWidth="300" />
-        <PasswordField fx:id="repetirContrasenaField" promptText="Repetir contraseña" maxWidth="300" />
+        <TextField fx:id="nombreField" maxWidth="300" promptText="Nombre completo" />
+        <TextField fx:id="emailField" maxWidth="300" promptText="Correo electrónico" />
+        <PasswordField fx:id="contrasenaField" maxWidth="300" promptText="Contraseña" />
+        <PasswordField fx:id="repetirContrasenaField" maxWidth="300" promptText="Repetir contraseña" />
 
 
-        <Button text="Registrarse" onAction="#registrarUsuario" maxWidth="150" />
+        <Button maxWidth="150" onAction="#registrarUsuario" text="Registrarse" />
+      <Button fx:id="regresarButton" mnemonicParsing="false" onAction="#regresarButtonClick" text="Regresar" />
 
-        <Label fx:id="mensajeLabel" textFill="red" wrapText="true" maxWidth="300" />
+        <Label fx:id="mensajeLabel" maxWidth="300" textFill="red" wrapText="true" />
     </VBox>
 </AnchorPane>

@@ -7,6 +7,12 @@ import javafx.scene.control.*;
 
 import java.sql.*;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.Node;
+
 public class RegistroController {
 
     @FXML private TextField nombreField;
@@ -14,6 +20,20 @@ public class RegistroController {
     @FXML private PasswordField contrasenaField;
     @FXML private PasswordField repetirContrasenaField;
     @FXML private Label mensajeLabel;
+    @FXML private Button regresarButton;
+
+    @FXML
+    public void regresarButtonClick(ActionEvent event){
+                try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     private void registrarUsuario(ActionEvent event) {
@@ -61,14 +81,23 @@ public class RegistroController {
 
                 int filas = insertStmt.executeUpdate();
                 if (filas > 0) {
-                    mensajeLabel.setText("✅ Usuario registrado correctamente.");
-                    limpiarCampos();
+                        try {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/login.fxml"));
+                            Parent root = loader.load();
+                            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                            stage.setScene(new Scene(root));
+                            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
                 } else {
                     mensajeLabel.setText("❌ Error al registrar el usuario.");
                 }
             }
         } catch (SQLException e) {
             mensajeLabel.setText("❌ Error en la base de datos: " + e.getMessage());
+        }finally{
+            ConexionBD.cerrarConexion();
         }
     }
 
