@@ -4,16 +4,23 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/estilos.css" fx:controller="es.prorix.gusanoguason.controllers.JugarController">
+<StackPane xmlns:fx="http://javafx.com/fxml" stylesheets="@../css/estilos.css" fx:controller="es.prorix.gusanoguason.controllers.JugarController">
     <children>
-        <Canvas fx:id="canvas" width="500" height="500" />
 
-        <VBox fx:id="gameOverBox" spacing="10" layoutX="100" layoutY="180" visible="false" style="-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 20; -fx-background-radius: 10;">
-            <Label fx:id="gameOverLabel" text="¡Has perdido!" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
+        <AnchorPane prefWidth="500" prefHeight="500" style="-fx-background-color: #1e1e1e; -fx-border-color: #888; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0.2, 0, 4)">
+            <Canvas fx:id="lienzo" width="500" height="500" layoutX="0" layoutY="0"/>
+        </AnchorPane>
+
+        <VBox fx:id="cajaGameOver" spacing="15" alignment="CENTER" visible="false"
+              style="-fx-background-color: rgba(0, 0, 0, 0.85); -fx-padding: 30; -fx-background-radius: 15;"
+              maxWidth="300">
+            <Label fx:id="etiquetaGameOver" text="¡Has perdido!" style="-fx-text-fill: white; -fx-font-size: 20px;"/>
             <Button fx:id="volverJugar" text="Volver a jugar" onAction="#onVolverAJugar"/>
             <Button fx:id="salir" text="Ir al perfil" onAction="#onIrAlPerfil"/>
         </VBox>
+
     </children>
-</AnchorPane>
+</StackPane>

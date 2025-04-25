@@ -1,7 +1,5 @@
 package es.prorix.gusanoguason.controllers;
 
-
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,18 +17,30 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 
-
-
- 
-
+/**
+ * Clase controladora de la pantalla de perfil
+ * 
+ * @author prorix
+ * @version 1.3.1
+ */
 public class PerfilController {
 
-    @FXML private Label labelNombre;
-    @FXML private Label labelCorreo;
-    @FXML private Label labelRecord;
-    @FXML private Button jugarButton;
-    @FXML private Button cerrarSesionButton;
+    @FXML
+    private Label labelNombre;
+    @FXML
+    private Label labelCorreo;
+    @FXML
+    private Label labelRecord;
+    @FXML
+    private Button jugarButton;
+    @FXML
+    private Button cerrarSesionButton;
 
+    /**
+     * Metodo del boton para acceder al juego
+     * 
+     * @param event evento
+     */
     @FXML
     public void jugarButtonClick(ActionEvent event) {
         try {
@@ -44,6 +54,11 @@ public class PerfilController {
         }
     }
 
+    /**
+     * Metodo del boton para cerrar sesion
+     * 
+     * @param event evento
+     */
     @FXML
     public void cerrarSesionButtonClick(ActionEvent event) {
         try {
@@ -57,6 +72,9 @@ public class PerfilController {
         }
     }
 
+    /**
+     * Metodo inicializar
+     */
     @FXML
     public void initialize() {
         Usuario usuario = UsuarioService.getUsuarioActual();
@@ -66,27 +84,30 @@ public class PerfilController {
             labelRecord.setText("🏆 Récord: " + getRecordBBDD());
         }
 
-
-
     }
 
-    public int getRecordBBDD(){
+    /**
+     * Metodo para obtener el record del usuario actual de la base de datos
+     * 
+     * @return record del usuario actual
+     */
+    public int getRecordBBDD() {
         Connection conn = ConexionBD.getConexion();
         try {
             Usuario usuarioActual = UsuarioService.getUsuarioActual();
             String querry = "SELECT record FROM usuarios WHERE email=?";
             PreparedStatement pS = conn.prepareStatement(querry);
             pS.setString(1, usuarioActual.getEmail());
-            ResultSet rs= pS.executeQuery();
+            ResultSet rs = pS.executeQuery();
             if (rs.next()) {
                 return rs.getInt("record");
-            }else{
-            return 0;
-        }
+            } else {
+                return 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
-        }finally{
+        } finally {
             ConexionBD.cerrarConexion();
         }
 

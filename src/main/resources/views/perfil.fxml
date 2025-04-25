@@ -2,12 +2,28 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15" style="-fx-padding: 30;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" stylesheets="@../css/estilos.css" fx:controller="es.prorix.gusanoguason.controllers.PerfilController">
-    <Label fx:id="labelNombre" style="-fx-font-size: 18;" />
-    <Label fx:id="labelCorreo" style="-fx-font-size: 16;" />
-   <Button fx:id="jugarButton" mnemonicParsing="false" onAction="#jugarButtonClick" text="Jugar" />
-   <Button fx:id="cerrarSesionButton" mnemonicParsing="false" onAction="#cerrarSesionButtonClick" text="Cerrar sesión" />
-    <Label fx:id="labelRecord" style="-fx-font-size: 16;" />
-</VBox>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21"
+            fx:controller="es.prorix.gusanoguason.controllers.PerfilController"
+            stylesheets="@../css/estilos.css"
+            prefWidth="400" prefHeight="500"
+            style="-fx-padding: 40;">
+    
+    <center>
+        <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #2c2c3a; -fx-padding: 30; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 10, 0, 0, 5);">
+            
+            <Label text="👾 Perfil de Usuario" style="-fx-font-size: 22px; -fx-text-fill: #ffffff; -fx-font-weight: bold;" />
+
+            <Label fx:id="labelNombre" style="-fx-font-size: 16px;" />
+            <Label fx:id="labelCorreo" style="-fx-font-size: 14px;" />
+            <Label fx:id="labelRecord" style="-fx-font-size: 14px;" />
+
+            <VBox spacing="10" alignment="CENTER">
+                <Button fx:id="jugarButton" onAction="#jugarButtonClick" text="🎮 Jugar" minWidth="150" />
+                <Button fx:id="cerrarSesionButton" onAction="#cerrarSesionButtonClick" text="🚪 Cerrar sesión" minWidth="150" />
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

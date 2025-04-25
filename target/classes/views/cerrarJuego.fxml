@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="215.0" prefWidth="415.0" stylesheets="@../css/estilos.css" fx:controller="main.java.es.prorix.gusanoguason.controllers.CerrarJuegoController" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="46.0" layoutY="14.0" prefHeight="62.0" prefWidth="324.0" text="¿Estas seguro de que quieres cerrar el juego?" textAlignment="CENTER" />
+      <Button fx:id="cerrarButton" layoutX="46.0" layoutY="100.0" mnemonicParsing="false" onAction="#cerrarButtonClick" prefHeight="62.0" prefWidth="110.0" text="Cerrar" />
+      <Button fx:id="cancelarButton" layoutX="260.0" layoutY="100.0" mnemonicParsing="false" onAction="#cancelarButtonClick" prefHeight="62.0" prefWidth="110.0" text="Cancelar" />
+   </children>
+</Pane>

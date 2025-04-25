@@ -19,223 +19,261 @@ import javafx.event.ActionEvent;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 import es.prorix.gusanoguason.database.ConexionBD;
 import es.prorix.gusanoguason.models.Usuario;
 import es.prorix.gusanoguason.util.UsuarioService;
 
-
+/**
+ * Clase controladora del funcionamiento del juego
+ * 
+ * @author prorix
+ * @version 1.3.5
+ */
 public class JugarController {
 
     @FXML
-    private Canvas canvas;
+    private Canvas lienzo;
 
     @FXML
-    private VBox gameOverBox;
+    private VBox cajaGameOver;
 
     @FXML
-    private Label gameOverLabel;
+    private Label etiquetaGameOver;
 
     @FXML
-    private Button volverJugar;
+    private Button botonVolverJugar;
 
     @FXML
-    private Button salir;
+    private Button botonSalir;
 
-    private final int tileSize = 25;
-    private final int width = 20;
-    private final int height = 20;
+    private final int tamanoCelda = 25;
+    private final int ancho = 20;
+    private final int alto = 20;
 
-    private enum Direction {UP, DOWN, LEFT, RIGHT}
-
-    private Direction direction = Direction.RIGHT;
-    private Direction nextDirection = Direction.RIGHT;
-
-    private List<int[]> snake;
-    private int[] apple;
-    private boolean running = false;
-    private boolean revived = false;
-    private int score = 0;
-    private int bestScore = 0; // Enlaza con base de datos si quieres
-    private final Random random = new Random();
-
-    private AnimationTimer timer;
-
-    @FXML
-    public void initialize() {
-        canvas.setFocusTraversable(true);
-        canvas.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyPress);
-        startGame();
+    private enum Direccion {
+        ARRIBA, ABAJO, IZQUIERDA, DERECHA
     }
 
-    private void startGame() {
-        gameOverBox.setVisible(false);
-        snake = new LinkedList<>();
-        snake.add(new int[]{10, 10});
-        direction = Direction.RIGHT;
-        nextDirection = Direction.RIGHT;
-        score = 0;
-        revived = false;
-        spawnApple();
-        running = true;
+    private Direccion direccion = Direccion.DERECHA;
+    private Direccion siguienteDireccion = Direccion.DERECHA;
 
-        timer = new AnimationTimer() {
-            long lastTick = 0;
+    private List<int[]> gusano;
+    private int[] manzana;
+    private boolean jugando = false;
+    private boolean revivido = false;
+    private int puntuacion = 0;
+    private int mejorPuntuacion = 0;
+    private final Random aleatorio = new Random();
+
+    private AnimationTimer temporizador;
+    private long velocidad = 200_000_000;
+
+    /**
+     * Metodo inicializar
+     */
+    @FXML
+    public void initialize() {
+        lienzo.setFocusTraversable(true);
+        lienzo.addEventHandler(KeyEvent.KEY_PRESSED, this::manejarTecla);
+        iniciarJuego();
+    }
+
+    /**
+     * Metodo que da comienzo al juego
+     */
+    private void iniciarJuego() {
+        cajaGameOver.setVisible(false);
+        gusano = new LinkedList<>();
+        gusano.add(new int[] { 10, 10 });
+        direccion = Direccion.DERECHA;
+        siguienteDireccion = Direccion.DERECHA;
+        puntuacion = 0;
+        velocidad = 200_000_000;
+        revivido = false;
+        generarManzana();
+        jugando = true;
+
+        temporizador = new AnimationTimer() {
+            long ultimoTick = 0;
 
             @Override
-            public void handle(long now) {
-                if (lastTick == 0) {
-                    lastTick = now;
-                    tick();
+            public void handle(long ahora) {
+                if (ultimoTick == 0) {
+                    ultimoTick = ahora;
+                    actualizar();
                     return;
                 }
-                if (now - lastTick > 200_000_000) {
-                    lastTick = now;
-                    tick();
+                if (ahora - ultimoTick > velocidad) {
+                    ultimoTick = ahora;
+                    actualizar();
                 }
             }
         };
-        timer.start();
+        temporizador.start();
     }
 
-    private void tick() {
-        if (!running) return;
+    /**
+     * Metodo que actualiza la pantalla del juego constantemente
+     */
+    private void actualizar() {
+        if (!jugando)
+            return;
 
-        direction = nextDirection;
-        int[] head = snake.get(0);
-        int newX = head[0];
-        int newY = head[1];
+        direccion = siguienteDireccion;
+        int[] cabeza = gusano.get(0);
+        int nuevoX = cabeza[0];
+        int nuevoY = cabeza[1];
 
-        switch (direction) {
-            case UP -> newY--;
-            case DOWN -> newY++;
-            case LEFT -> newX--;
-            case RIGHT -> newX++;
+        switch (direccion) {
+            case ARRIBA -> nuevoY--;
+            case ABAJO -> nuevoY++;
+            case IZQUIERDA -> nuevoX--;
+            case DERECHA -> nuevoX++;
         }
 
-        int[] newHead = new int[]{newX, newY};
+        int[] nuevaCabeza = new int[] { nuevoX, nuevoY };
 
-        // Colisión
-        boolean collision = newX < 0 || newY < 0 || newX >= width || newY >= height
-                || snake.stream().anyMatch(p -> Arrays.equals(p, newHead));
+        boolean colision = nuevoX < 0 || nuevoY < 0 || nuevoX >= ancho || nuevoY >= alto
+                || gusano.stream().anyMatch(p -> Arrays.equals(p, nuevaCabeza));
 
-        if (collision) {
-            if (!revived && random.nextDouble() < 0.3) {
-                revived = true;
-                return; // continúa como si nada hubiera pasado
+        if (colision) {
+            if (!revivido && aleatorio.nextDouble() < 0.3) {
+                revivido = true;
+                return;
             } else {
-                running = false;
-                timer.stop();
-                if (score > bestScore) bestScore = score;
-                gameOverBox.setVisible(true);
-                gameOverLabel.setText("¡Has perdido!\nPuntuación: " + score);
+                jugando = false;
+                temporizador.stop();
+                if (puntuacion > mejorPuntuacion)
+                    mejorPuntuacion = puntuacion;
+                cajaGameOver.setVisible(true);
+                etiquetaGameOver.setText("¡Has perdido!\nPuntuación: " + puntuacion);
                 revisarRecord();
                 return;
             }
         }
 
+        gusano.add(0, nuevaCabeza);
 
-
-        snake.add(0, newHead);
-
-        if (Arrays.equals(newHead, apple)) {
-            score++;
-            spawnApple();
+        if (Arrays.equals(nuevaCabeza, manzana)) {
+            puntuacion++;
+            generarManzana();
+            ajustarVelocidad();
         } else {
-            snake.remove(snake.size() - 1);
+            gusano.remove(gusano.size() - 1);
         }
 
-        draw();
+        dibujar();
     }
 
-    public boolean revisarRecord(){
+    /**
+     * Metodo para aumentar la velocidad segun el jugador gana puntos
+     */
+    private void ajustarVelocidad() {
+        if (puntuacion % 10 == 0 && puntuacion <= 50) {
+            velocidad = Math.max(velocidad - 20_000_000, 100_000_000);
+        }
+    }
+
+    /**
+     * Metodo que revisa si la partida jugada es un nuevo record
+     */
+    public boolean revisarRecord() {
         Usuario usuarioActual = UsuarioService.getUsuarioActual();
         String emailActual = usuarioActual.getEmail();
         try {
+            Connection conn = ConexionBD.getConexion();
             Connection conn2 = ConexionBD.getConexion();
-            usuarioActual.setRecord(score);
+            usuarioActual.setRecord(puntuacion);
             String queryS = "SELECT record FROM usuarios WHERE email=?";
             PreparedStatement pStatement = conn2.prepareStatement(queryS);
-            record.setInt(1, emailActual);
-            return record.executeUpdate()>0;
+            pStatement.setString(1, emailActual);
+            ResultSet resultRecord = pStatement.executeQuery();
+            int recordActual = resultRecord.getInt("record");
+
+            if (puntuacion > recordActual) {
+                usuarioActual.setRecord(puntuacion);
+                String updateRecord = "UPDATE usuarios SET record=? WHERE email=?";
+                PreparedStatement record = conn.prepareStatement(updateRecord);
+                record.setInt(1, puntuacion);
+                record.setString(2, usuarioActual.getEmail());
+                return record.executeUpdate() > 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }finally{
+        } finally {
             ConexionBD.cerrarConexion();
-        }
-
-        if (score > usuarioActual.getRecord()) {
-            try {
-                Connection conn = ConexionBD.getConexion();
-                usuarioActual.setRecord(score);
-                String updateRecord = "UPDATE usuarios SET record=? WHERE email=?";
-                PreparedStatement record = conn.prepareStatement(updateRecord);
-                record.setInt(1, score);
-                record.setString(2, usuarioActual.getEmail());
-                return record.executeUpdate()>0;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }finally{
-                ConexionBD.cerrarConexion();
-            }
-
         }
         return false;
     }
 
-    private void draw() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+    /**
+     * Metodo que dibuja los elementos de la pantalla
+     */
+    private void dibujar() {
+        GraphicsContext gc = lienzo.getGraphicsContext2D();
+
         gc.setFill(Color.web("#1e1e1e"));
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.fillRect(0, 0, lienzo.getWidth(), lienzo.getHeight());
 
-        // Dibujar manzana
         gc.setFill(Color.RED);
-        gc.fillOval(apple[0] * tileSize, apple[1] * tileSize, tileSize, tileSize);
+        gc.fillOval(manzana[0] * tamanoCelda, manzana[1] * tamanoCelda, tamanoCelda, tamanoCelda);
 
-        // Dibujar gusano
-        for (int i = 0; i < snake.size(); i++) {
-            int[] p = snake.get(i);
-            gc.setFill(i == 0 ? Color.LIME : Color.GREEN);
-            gc.fillRect(p[0] * tileSize, p[1] * tileSize, tileSize, tileSize);
+        for (int i = 0; i < gusano.size(); i++) {
+            int[] p = gusano.get(i);
+            gc.setFill(i == 0 ? Color.LIMEGREEN : Color.DARKGREEN);
+            gc.fillRoundRect(p[0] * tamanoCelda, p[1] * tamanoCelda, tamanoCelda, tamanoCelda, 5, 5);
         }
 
-        // Puntos
-        gc.setFill(Color.WHITE);
-        gc.fillText("Puntos: " + score, 10, 20);
+        gc.setFill(Color.web("#ffffff"));
+        gc.fillText("Puntos: " + puntuacion, 10, 20);
     }
 
-    private void spawnApple() {
+    /**
+     * Metodo que genera las manzanas en posiciones aleatorias en el mapa
+     */
+    private void generarManzana() {
         do {
-            apple = new int[]{random.nextInt(width), random.nextInt(height)};
-        } while (snake.stream().anyMatch(p -> Arrays.equals(p, apple)));
+            manzana = new int[] { aleatorio.nextInt(ancho), aleatorio.nextInt(alto) };
+        } while (gusano.stream().anyMatch(p -> Arrays.equals(p, manzana)));
     }
 
-    private void handleKeyPress(KeyEvent e) {
-        KeyCode code = e.getCode();
-        switch (code) {
+    private void manejarTecla(KeyEvent e) {
+        KeyCode codigo = e.getCode();
+        switch (codigo) {
             case UP -> {
-                if (direction != Direction.DOWN) nextDirection = Direction.UP;
+                if (direccion != Direccion.ABAJO)
+                    siguienteDireccion = Direccion.ARRIBA;
             }
             case DOWN -> {
-                if (direction != Direction.UP) nextDirection = Direction.DOWN;
+                if (direccion != Direccion.ARRIBA)
+                    siguienteDireccion = Direccion.ABAJO;
             }
             case LEFT -> {
-                if (direction != Direction.RIGHT) nextDirection = Direction.LEFT;
+                if (direccion != Direccion.DERECHA)
+                    siguienteDireccion = Direccion.IZQUIERDA;
             }
             case RIGHT -> {
-                if (direction != Direction.LEFT) nextDirection = Direction.RIGHT;
+                if (direccion != Direccion.IZQUIERDA)
+                    siguienteDireccion = Direccion.DERECHA;
             }
         }
     }
 
+    /**
+     * Metodo del boton de volver a jugar cuando se pierde
+     */
     @FXML
     public void onVolverAJugar() {
-        startGame();
+        iniciarJuego();
     }
 
+    /**
+     * Metodo del boton para volver al perfil cuando se pierde
+     */
     @FXML
     public void onIrAlPerfil(ActionEvent event) {
         try {

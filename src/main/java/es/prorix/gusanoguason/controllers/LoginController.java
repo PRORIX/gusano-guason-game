@@ -1,6 +1,7 @@
 package es.prorix.gusanoguason.controllers;
 
 import es.prorix.gusanoguason.database.ConexionBD;
+import es.prorix.gusanoguason.main.MainApp;
 import es.prorix.gusanoguason.models.Usuario;
 import es.prorix.gusanoguason.util.UsuarioService;
 import javafx.event.ActionEvent;
@@ -19,16 +20,51 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Clase controladora de la pantalla de login
+ * 
+ * @author prorix
+ * @version 1.1.3
+ */
 public class LoginController {
 
-    @FXML private TextField emailField;
-    @FXML private PasswordField contrasenaField;
-    @FXML private Label mensajeLabel;
-    @FXML private Hyperlink registrarLink;
-    @FXML private Button olvidarPass;
-
     @FXML
-    private void olvidarPassClick(ActionEvent event){
+    private TextField emailField;
+    @FXML
+    private PasswordField contrasenaField;
+    @FXML
+    private Label mensajeLabel;
+    @FXML
+    private Hyperlink registrarLink;
+    @FXML
+    private Button olvidarPass;
+    @FXML
+    private Button salirButton;
+
+    /**
+     * Metodo del boton de salir del juego
+     */
+    @FXML
+    public void salirButtonClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/views/cerrarJuego.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
+            stage.setTitle("Estadísticas del Jugador");
+            stage.setResizable(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Metodo del boton para acceder a la pantalla de olvidar la contrasenia
+     * 
+     * @param event evento
+     */
+    @FXML
+    private void olvidarPassClick(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/recuperarContrasenia.fxml"));
             Parent root = loader.load();
@@ -40,8 +76,13 @@ public class LoginController {
         }
     }
 
+    /**
+     * Metodo del boton para acceder a la pantalla de registro
+     * 
+     * @param event evento
+     */
     @FXML
-    private void registrarLinkClick(ActionEvent event){
+    private void registrarLinkClick(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/registro.fxml"));
             Parent root = loader.load();
@@ -53,6 +94,11 @@ public class LoginController {
         }
     }
 
+    /**
+     * Metodo del boton de iniciar sesion
+     * 
+     * @param event evento
+     */
     @FXML
     private void iniciarSesion(ActionEvent event) {
         String email = emailField.getText().trim();
@@ -79,7 +125,6 @@ public class LoginController {
                 Usuario usuario = new Usuario(nombre, email, "", record); // contrasena vacía
                 UsuarioService.setUsuarioActual(usuario);
 
-
                 // Cambiar de pantalla al perfil
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/perfil.fxml"));
                 Parent root = loader.load();
@@ -93,7 +138,7 @@ public class LoginController {
             mensajeLabel.setText("❌ Error al conectar: " + e.getMessage());
         } catch (Exception e) {
             mensajeLabel.setText("❌ Error al cargar perfil: " + e.getMessage());
-        }finally{
+        } finally {
             ConexionBD.cerrarConexion();
         }
     }
