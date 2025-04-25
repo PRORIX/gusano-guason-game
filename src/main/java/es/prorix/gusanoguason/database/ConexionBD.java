@@ -4,11 +4,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Clase que controla la conexion del programar con la base de datos
+ * @author prorix
+ * @version 1.0.0
+ */
 public class ConexionBD {
     private static final String URL = "jdbc:sqlite:src/main/resources/Usuarios.db"; // Cambia esto si haces JAR
 
     private static Connection conexion = null;
 
+    /**
+     * Metodo que genera la conexion
+     * @return Conexion generada
+     */
     public static Connection getConexion() {
         if (conexion == null) {
             try {
@@ -21,6 +30,9 @@ public class ConexionBD {
         return conexion;
     }
 
+    /**
+     * Metodo que cierra la conexion generada anteriormente
+     */
     public static void cerrarConexion() {
         if (conexion != null) {
             try {

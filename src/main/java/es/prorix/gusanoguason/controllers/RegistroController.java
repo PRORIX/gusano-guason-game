@@ -13,6 +13,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 
+/**
+ * Clase controladora de la pantalla de registro de usuarios
+ * @author prorix
+ * @version 1.0.6
+ */
 public class RegistroController {
 
     @FXML private TextField nombreField;
@@ -22,6 +27,10 @@ public class RegistroController {
     @FXML private Label mensajeLabel;
     @FXML private Button regresarButton;
 
+    /**
+     * Metodo del boton para regresar
+     * @param event evento
+     */
     @FXML
     public void regresarButtonClick(ActionEvent event){
                 try {
@@ -35,6 +44,10 @@ public class RegistroController {
         }
     }
 
+    /**
+     * Metodo del boton de confirmar el registro de usuario
+     * @param event event
+     */
     @FXML
     private void registrarUsuario(ActionEvent event) {
         String nombre = nombreField.getText().trim();
@@ -47,13 +60,11 @@ public class RegistroController {
             return;
         }
 
-        // Validación de formato de email
         if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
             mensajeLabel.setText("📧 El correo electrónico no tiene un formato válido.");
             return;
         }
 
-        // Comprobación de contraseñas iguales
         if (!contrasena.equals(repetirContrasena)) {
             mensajeLabel.setText("🔐 Las contraseñas no coinciden.");
             return;
@@ -62,7 +73,6 @@ public class RegistroController {
         Connection conn = ConexionBD.getConexion();
 
         try  {
-            // Verificar si ya existe el usuario
             String consulta = "SELECT * FROM usuarios WHERE email = ?";
             PreparedStatement checkStmt = conn.prepareStatement(consulta);
             checkStmt.setString(1, email);
@@ -71,7 +81,6 @@ public class RegistroController {
             if (rs.next()) {
                 mensajeLabel.setText("❌ Ya existe un usuario con ese correo.");
             } else {
-                // Insertar nuevo usuario
                 String insertar = "INSERT INTO usuarios(nombre, email, contrasena, record) VALUES (?, ?, ?, ?)";
                 PreparedStatement insertStmt = conn.prepareStatement(insertar);
                 insertStmt.setString(1, nombre);
@@ -101,10 +110,5 @@ public class RegistroController {
         }
     }
 
-    private void limpiarCampos() {
-        nombreField.clear();
-        emailField.clear();
-        contrasenaField.clear();
-        repetirContrasenaField.clear();
-    }
+
 }
