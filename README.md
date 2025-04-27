@@ -84,6 +84,7 @@ GusanoGuasón/
 ## Créditos
 
 - Desarrollado con pasión por PRORIX.
+- Recomendaciones de diseño por CARCOCHE_39
 - Inspirado en el clásico juego Snake y adaptado para entornos educativos y lúdicos.
 
 ---
