@@ -81,18 +81,6 @@ GusanoGuasón/
 
 ---
 
-## Capturas de pantalla
-
-> *(Aquí puedes incluir imágenes del login, perfil y gameplay. Crea una carpeta `docs/` y guarda las capturas allí)*
-
-```markdown
-![Login](docs/captura_login.png)
-![Perfil](docs/captura_perfil.png)
-![Juego](docs/captura_juego.png)
-```
-
----
-
 ## Créditos
 
 - Desarrollado con pasión por PRORIX.
