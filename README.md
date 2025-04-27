@@ -1,6 +1,6 @@
 # GusanoGuasón
 
-**GusanoGuasón** es un divertido y visualmente atractivo juego del gusano (Snake) hecho en **JavaFX**, donde el jugador controla un gusano que debe comer manzanas para crecer sin chocar contra sí mismo ni los bordes. El proyecto incorpora elementos modernos como login, registro, base de datos, revivir aleatorio, y un sistema de puntuación con persistencia.
+**GusanoGuasón** es un divertido y visualmente atractivo juego del gusano (Snake) hecho en **JavaFX**, donde el jugador controla un gusano que debe comer manzanas para crecer sin chocar contra sí mismo ni los bordes. El proyecto incorpora elementos modernos como login, registro, base de datos, revivir, y un sistema de puntuación con persistencia.
 
 ---
 
