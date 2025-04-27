@@ -12,9 +12,8 @@
   - Manzanas generadas aleatoriamente.
   - Movimiento fluido y controles responsivos.
   - Sistema de puntuación en tiempo real.
-  - Probabilidad del 30% de "revivir" tras perder.
 - **Pantalla de perfil**: Muestra tu usuario y puntuación máxima.
-- **Controladores separados** para una mejor organización (MVC).
+- **Controladores separados** para una mejor organización.
 - **Diseño responsive** en las ventanas de juego y menús.
 - **Persistencia de datos** con `Usuarios.db`.
 
@@ -64,7 +63,7 @@ GusanoGuasón/
 
 1. **Clona el repositorio**:
    ```bash
-   git clone https://github.com/tu-usuario/GusanoGuason.git
+   git clone https://github.com/PRORIX/gusano-guason-game
    cd GusanoGuason
    ```
 
@@ -79,9 +78,6 @@ GusanoGuasón/
 ## Controles del juego
 
 - **Flechas del teclado**: Mover el gusano.
-- **Game Over**:
-  - 30% de probabilidad de revivir y continuar la partida.
-  - Si no revives, puedes volver a jugar o ir al perfil.
 
 ---
 
@@ -99,7 +95,7 @@ GusanoGuasón/
 
 ## Créditos
 
-- Desarrollado con pasión por [TuNombreAquí].
+- Desarrollado con pasión por PRORIX.
 - Inspirado en el clásico juego Snake y adaptado para entornos educativos y lúdicos.
 
 ---
@@ -108,11 +104,5 @@ GusanoGuasón/
 
 Este proyecto está bajo la Licencia MIT.  
 Eres libre de modificar, distribuir y usar este código con fines educativos o personales.
-
----
-
-## ¿Quieres aportar?
-
-¡Claro que sí! Puedes enviar PRs con mejoras de rendimiento, nuevos modos de juego, rankings online o incluso nuevos estilos visuales.
 
 ---
